@@ -379,7 +379,7 @@ wire vsub = csub | i[DEC];
 wire zn8 = o[7] & ~&o[3:2] & o[3:0] != 4'b0111 |
 	o[7:6] == 2'b01 & o[3:0] != 4'b1110 | o[7:4] == 4'b0001;
 wire zn8st = o[7] & o[3:0] == 4'b0111;
-wire zn16 = o[7] & &o[3:2] & o[1:0] != 2'b01;
+wire zn16 = o[7] & &o[3:1];
 wire zx16 = o[7:1] == 7'b0000100;
 reg cadd1, csub1, cvl1, cvr1, c1_1, vadd1, vsub1, zn8_1, zn8st1, zn16_1, zx16_1;
 reg t_z_st1, t_n_st1, t_i;
@@ -416,9 +416,9 @@ wire t_n = zn8_1 & alu_y[7] | zn8st1 & t_n_st1 |
 reg update_c, update_v, update_z, update_n, update_i;
 always @(posedge clk) begin
 	update_c <= cadd | csub | cvl | cvr | c0 | c1;
-	update_v <= vadd | vsub | cvl | cvr | v0 | i[CLVSEV];
-	update_z <= zn8 | zn8st | zn16 | zx16;
-	update_n <= zn8 | zn8st | zn16;
+	update_v <= vadd | vsub | cvl | cvr | v0 | i[CLVSEV] | i[CPX];
+	update_z <= zn8 | zn8st | zn16 | zx16 | i[CPX];
+	update_n <= zn8 | zn8st | zn16 | i[CPX];
 	update_i <= i[CLISEI] | wcnt[2] & (wcnt[1] | |vect_n);
 end
 
