@@ -7,12 +7,12 @@
 // not implemented: DAA, H flag
 
 module f6800wide(clk, reset, pc_out, insn_in, adr_out, data_in, data_out,
-	wr_l, wr_u, intreq, intack, nmireq, nmiack);
+	rd_l, rd_u, wr_l, wr_u, intreq, intack, nmireq, nmiack);
 input clk, reset, intreq, nmireq;
 input [31:0] insn_in;
 input [15:0] data_in;
 output [15:0] pc_out, adr_out, data_out;
-output wr_l, wr_u, intack, nmiack;
+output rd_l, rd_u, wr_l, wr_u, intack, nmiack;
 
 localparam C = 0;
 localparam V = 1;
@@ -242,6 +242,9 @@ wire [15:0] wd16 = o[1] | |wcnt ? o[6] | |wcnt ? wd_r : fwd_sp : nextpc_normal;
 wire wr_s0_l = ~state & (i[BSR] | i[JSR] | i[STS] | i[STX]) | wcnt_dbl;
 wire wr_s0_u = ~state & (i[PSH] | i[STA] | i[CLR] & o[5]) | wcnt_sngl;
 wire [15:0] wd_s0 = { wr_s0_l ? wd16[15:8] : wd8, wd16[7:0] };
+assign rd_l = ~state & o[7] & |o[5:4] & o[3:0] == 4'b1110;
+assign rd_u = ~state &
+	(o[7] & |o[5:4] & ~&o[2:0] | o[7:5] == 3'b011 & ~&o[3:0]);
 
 //
 // EXEC
